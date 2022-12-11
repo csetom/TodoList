@@ -4,6 +4,8 @@
  */
 package com.mycompany.modulok;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -11,9 +13,21 @@ import java.util.Date;
  * @author tcses
  */
 public class Task {
+    
+    private String Description;
+    private Date DeadLine;
+    private String State; // VÁRAKOZÓ,BEFEJEZETT vagy HALASZTOTT
+
+
+    public Task() {
+    }
 
     public String getDescription() {
         return Description;
+    }
+    public String GetDeadLineToString(){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
+        return  dateFormat.format(DeadLine);  
     }
 
     public void setDescription(String Description) {
@@ -41,12 +55,9 @@ public class Task {
         this.DeadLine = DeadLine;
         this.State = State;
     }
-    
-    private String Description;
-    private Date DeadLine;
-    private String State; // VÁRAKOZÓ,BEFEJEZETT vagy HALASZTOTT
-    
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return Description + ";" + DeadLine + ";" + State + ';';
+    }   
 }
