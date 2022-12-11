@@ -11,9 +11,42 @@ import java.util.Date;
  * @author tcses
  */
 public class Task {
+
+    public String getDescription() {
+        return Description;
+    }
+
+    public void setDescription(String Description) {
+        this.Description = Description;
+    }
+
+    public Date getDeadLine() {
+        return DeadLine;
+    }
+
+    public void setDeadLine(Date DeadLine) {
+        this.DeadLine = DeadLine;
+    }
+
+    public String getState() {
+        return State;
+    }
+
+    public void setState(String State) {
+        this.State = State;
+    }
+
+    public Task(String Description, Date DeadLine, String State) {
+        this.Description = Description;
+        this.DeadLine = DeadLine;
+        this.State = State;
+    }
     
     private String Description;
     private Date DeadLine;
     private String State; // VÁRAKOZÓ,BEFEJEZETT vagy HALASZTOTT
+    
+    
+    
     
 }
