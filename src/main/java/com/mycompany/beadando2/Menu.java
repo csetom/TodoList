@@ -50,7 +50,7 @@ public class Menu extends javax.swing.JFrame {
         TaskCancelButton = new javax.swing.JButton();
         TaskDate = new javax.swing.JTextField();
         TaskName = new javax.swing.JTextField();
-        jTextField1 = new javax.swing.JTextField();
+        jComboBox1 = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         TaskList = new javax.swing.JList<>();
         NewTask = new javax.swing.JButton();
@@ -91,15 +91,24 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
+        TaskDate.setToolTipText("Datum");
         TaskDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TaskDateActionPerformed(evt);
             }
         });
 
+        TaskName.setToolTipText("Neve");
         TaskName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TaskNameActionPerformed(evt);
+            }
+        });
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Folyamatban", "Kesz", "Uj" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
             }
         });
 
@@ -107,44 +116,49 @@ public class Menu extends javax.swing.JFrame {
         TaskEditFrame.getContentPane().setLayout(TaskEditFrameLayout);
         TaskEditFrameLayout.setHorizontalGroup(
             TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
+            .addComponent(jScrollPane2)
             .addGroup(TaskEditFrameLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, TaskEditFrameLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(TaskSaveButton)
-                        .addGap(18, 18, 18)
-                        .addComponent(TaskCancelButton))
+                    .addGroup(TaskEditFrameLayout.createSequentialGroup()
+                        .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(203, 203, 203))
                     .addGroup(TaskEditFrameLayout.createSequentialGroup()
                         .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(TaskEditFrameLayout.createSequentialGroup()
+                                .addComponent(TaskSaveButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(TaskCancelButton))
                             .addComponent(TaskHeaderLabel)
-                            .addComponent(TaskName, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(TaskDate, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                            .addComponent(TaskDate)
+                            .addGroup(TaskEditFrameLayout.createSequentialGroup()
+                                .addComponent(TaskName)
+                                .addGap(1, 1, 1)))
+                        .addGap(131, 131, 131))))
         );
         TaskEditFrameLayout.setVerticalGroup(
             TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(TaskEditFrameLayout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addComponent(TaskHeaderLabel)
-                .addGap(18, 18, 18)
+                .addGap(15, 15, 15)
                 .addComponent(TaskName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(9, 9, 9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(TaskDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
                 .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(TaskSaveButton)
                     .addComponent(TaskCancelButton))
                 .addGap(40, 40, 40))
         );
 
-        jTextField1.setText("jTextField1");
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Csesznak RT Task Manager 2000 with knucels");
+        setFont(new java.awt.Font("DejaVu Sans Mono", 0, 18)); // NOI18N
 
         TaskList.setModel(GetTaskList());
         TaskList.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -351,6 +365,9 @@ public class Menu extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_TaskNameActionPerformed
 
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -413,9 +430,9 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JMenu listMenu;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openMenuItem;
