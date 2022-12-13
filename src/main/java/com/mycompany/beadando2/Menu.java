@@ -37,6 +37,8 @@ public class Menu extends javax.swing.JFrame {
     private TaskManager taskManager = new TaskManager();
         Hashtable<String, Integer> IndexOfState = new Hashtable<String,Integer>();    
     private String sortState="";
+    private String filterState="";
+    ArrayList<String> TaskNameInList= new ArrayList<String>();
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -55,6 +57,7 @@ public class Menu extends javax.swing.JFrame {
         TaskDate = new javax.swing.JTextField();
         TaskName = new javax.swing.JTextField();
         TaskState = new javax.swing.JComboBox<>();
+        SortState = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         TaskList = new javax.swing.JList<>();
         NewTask = new javax.swing.JButton();
@@ -65,7 +68,10 @@ public class Menu extends javax.swing.JFrame {
         saveAsMenuItem = new javax.swing.JMenuItem();
         exitMenuItem = new javax.swing.JMenuItem();
         listMenu = new javax.swing.JMenu();
-        sortByNameMenu = new javax.swing.JMenuItem();
+        SortSubMENU = new javax.swing.JMenu();
+        SortByName = new javax.swing.JRadioButtonMenuItem();
+        sortByStateMenu = new javax.swing.JRadioButtonMenuItem();
+        sortByDateMenu = new javax.swing.JRadioButtonMenuItem();
         helpMenu = new javax.swing.JMenu();
         contentsMenuItem = new javax.swing.JMenuItem();
         aboutMenuItem = new javax.swing.JMenuItem();
@@ -165,6 +171,8 @@ public class Menu extends javax.swing.JFrame {
         setFont(new java.awt.Font("DejaVu Sans Mono", 0, 18)); // NOI18N
 
         TaskList.setModel(GetTaskList());
+        TaskList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        TaskList.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         TaskList.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 TaskListMouseClicked(evt);
@@ -220,15 +228,39 @@ public class Menu extends javax.swing.JFrame {
 
         menuBar.add(fileMenu);
 
-        listMenu.setText("List");
+        listMenu.setText("Lista");
 
-        sortByNameMenu.setText("Sort By Name");
-        sortByNameMenu.addActionListener(new java.awt.event.ActionListener() {
+        SortSubMENU.setText("Sort");
+
+        SortState.add(SortByName);
+        SortByName.setText("Name");
+        SortByName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sortByNameMenuActionPerformed(evt);
+                SortByNameActionPerformed(evt);
             }
         });
-        listMenu.add(sortByNameMenu);
+        SortSubMENU.add(SortByName);
+
+        SortState.add(sortByStateMenu);
+        sortByStateMenu.setSelected(true);
+        sortByStateMenu.setText("State");
+        sortByStateMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sortByStateMenuActionPerformed(evt);
+            }
+        });
+        SortSubMENU.add(sortByStateMenu);
+
+        SortState.add(sortByDateMenu);
+        sortByDateMenu.setText("Deadline");
+        sortByDateMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sortByDateMenuActionPerformed(evt);
+            }
+        });
+        SortSubMENU.add(sortByDateMenu);
+
+        listMenu.add(SortSubMENU);
 
         menuBar.add(listMenu);
 
@@ -321,10 +353,9 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_NewTaskActionPerformed
 
     private void EditTask(int index){
-        String name=TaskList.getSelectedValue();
+        String name=TaskNameInList.get(index);
         Task task=taskManager.getTaskByName(name);
         if(task!=null ){
-            taskManager.setEditedTask(index);
             TaskHeaderLabel.setText("Edit Task");
             TaskDescription.setText(task.getDescription());
             TaskName.setText(task.getName());
@@ -345,6 +376,7 @@ public class Menu extends javax.swing.JFrame {
     private void TaskCancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TaskCancelButtonActionPerformed
         // TODO add your handling code here:
         TaskEditFrame.setVisible(false);
+        taskManager.setEditedTask(null);
 
     }//GEN-LAST:event_TaskCancelButtonActionPerformed
 
@@ -358,11 +390,6 @@ public class Menu extends javax.swing.JFrame {
         }  
     }//GEN-LAST:event_TaskListMouseClicked
 
-    private void sortByNameMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortByNameMenuActionPerformed
-        sortState="ByName";
-        UpdateTaskList();
-    }//GEN-LAST:event_sortByNameMenuActionPerformed
-
     private void TaskDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TaskDateActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_TaskDateActionPerformed
@@ -373,6 +400,21 @@ public class Menu extends javax.swing.JFrame {
 
     private void TaskStateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TaskStateActionPerformed
     }//GEN-LAST:event_TaskStateActionPerformed
+
+    private void SortByNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SortByNameActionPerformed
+        sortState="ByName";
+        UpdateTaskList();        
+    }//GEN-LAST:event_SortByNameActionPerformed
+
+    private void sortByStateMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortByStateMenuActionPerformed
+        sortState="ByState";
+        UpdateTaskList();
+    }//GEN-LAST:event_sortByStateMenuActionPerformed
+
+    private void sortByDateMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortByDateMenuActionPerformed
+        sortState="ByDeadline";
+        UpdateTaskList();
+    }//GEN-LAST:event_sortByDateMenuActionPerformed
 
     /**
      * @param args the command line arguments
@@ -413,10 +455,19 @@ public class Menu extends javax.swing.JFrame {
         ArrayList<Task> lista = new ArrayList<Task>();
         lista=(ArrayList)taskManager.getTasks().clone();
         switch (sortState) {
-                case ("ByName"): lista.sort(Menu::SortByName);                    
+                case ("ByName"): lista.sort(Menu::SortByName);                
                     break;
+                case ("ByState"): lista.sort(Menu::SortByState);       
+                break;
+                    case ("ByDeadline"): lista.sort(Menu::SortByDate);       
+                break;
         }
-
+        switch (filterState) {
+//                case ("ByName"): lista.sort(Menu::SortByName);                    
+//                    break;
+        }
+        TaskNameInList = TaskManager.getTaskNames(lista);
+          
         return TaskManager.getTasksForListFx(lista);
     }
     public void UpdateTaskList() {
@@ -430,11 +481,26 @@ public class Menu extends javax.swing.JFrame {
     public static int SortByName(Task t1, Task t2) {
         return t1.getName().compareTo(t2.getName());
     };
+    public static int SortByState(Task t1, Task t2) {
+        return t1.getState().compareTo(t2.getState());
+    };
+    public static int SortByDate(Task t1, Task t2) {
+        return t1.getDeadLine().compareTo(t2.getDeadLine());
+    };
+    public static int SortByDeadline(Task t1, Task t2) {
+        return t1.getName().compareTo(t2.getName());
+    };
+    
+    
+    
 
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton NewTask;
+    private javax.swing.JRadioButtonMenuItem SortByName;
+    private javax.swing.ButtonGroup SortState;
+    private javax.swing.JMenu SortSubMENU;
     private javax.swing.JButton TaskCancelButton;
     private javax.swing.JTextField TaskDate;
     private javax.swing.JTextArea TaskDescription;
@@ -456,7 +522,8 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem openMenuItem;
     private javax.swing.JMenuItem saveAsMenuItem;
     private javax.swing.JMenuItem saveMenuItem;
-    private javax.swing.JMenuItem sortByNameMenu;
+    private javax.swing.JRadioButtonMenuItem sortByDateMenu;
+    private javax.swing.JRadioButtonMenuItem sortByStateMenu;
     // End of variables declaration//GEN-END:variables
 
 }

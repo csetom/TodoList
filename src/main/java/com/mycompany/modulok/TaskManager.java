@@ -29,13 +29,13 @@ public class TaskManager {
 
 
     private  ArrayList<Task> Tasks=new ArrayList<Task>();
-    private  int editedTask=-1;
+    private  Task editedTask;
 
-    public int getEditedTask() {
+    public Task getEditedTask() {
         return editedTask;
     }
 
-    public void setEditedTask(int editedTask) {
+    public void setEditedTask(Task editedTask) {
         this.editedTask = editedTask;
     }
 
@@ -46,7 +46,14 @@ public class TaskManager {
     public static ListModel<String> getTasksForListFx(ArrayList<Task> tasks) {
         DefaultListModel<String> listModel = new DefaultListModel<String>();
         tasks.forEach( (Task task)->{
-            listModel.addElement(task.getName());
+            listModel.addElement(task.getName()+" | Hatarido: "+ task.GetDeadLineToString()+" ("+task.getState()+")" );
+        });
+        return listModel;
+    }
+        public static ArrayList<String> getTaskNames (ArrayList<Task> tasks) {
+        ArrayList<String> listModel = new ArrayList<String>();
+        tasks.forEach( (Task task)->{
+            listModel.add(task.getName());
         });
         return listModel;
     }
@@ -91,23 +98,23 @@ public class TaskManager {
     };
 
     public void addOrEditTask(String Name, String description, Date datum, String state) {
-        if (editedTask>=0){
-            Task task=Tasks.get(editedTask);
-            task.setDescription(description);
-            task.setName(Name);
-            task.setDeadLine(datum);
-            task.setState(state);
-            editedTask=-1;
+        if (editedTask!=null){
+            editedTask.setDescription(description);
+            editedTask.setName(Name);
+            editedTask.setDeadLine(datum);
+            editedTask.setState(state);
         } else {
-            Tasks.add(new Task(Name, description,new Date(2022,11,11),state));
+            Tasks.add(new Task(Name, description,datum,state));
         }
+        editedTask=null;
     }
     public Task getTaskByIndex(int index) {
         return Tasks.get(index);
     }
     public Task getTaskByName(String name) {
-        return Tasks.stream().filter((Task t)->{
+        editedTask=Tasks.stream().filter((Task t)->{
             return t.getName().equals(name);
         }).findFirst().orElse(null);
+        return editedTask;
     }
 }
