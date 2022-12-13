@@ -10,8 +10,10 @@ import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JList;
@@ -28,11 +30,13 @@ public class Menu extends javax.swing.JFrame {
      */
     public Menu() {
         initComponents();
+        IndexOfState.put("Folyamatban", 0);
+        IndexOfState.put("Kesz", 1);
+        IndexOfState.put("Uj", 2);
     }
     private TaskManager taskManager = new TaskManager();
-    
-
-
+        Hashtable<String, Integer> IndexOfState = new Hashtable<String,Integer>();    
+    private String sortState="";
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -50,7 +54,7 @@ public class Menu extends javax.swing.JFrame {
         TaskCancelButton = new javax.swing.JButton();
         TaskDate = new javax.swing.JTextField();
         TaskName = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        TaskState = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         TaskList = new javax.swing.JList<>();
         NewTask = new javax.swing.JButton();
@@ -105,10 +109,10 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Folyamatban", "Kesz", "Uj" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        TaskState.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Folyamatban", "Kesz", "Uj" }));
+        TaskState.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                TaskStateActionPerformed(evt);
             }
         });
 
@@ -121,7 +125,7 @@ public class Menu extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(TaskEditFrameLayout.createSequentialGroup()
-                        .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(TaskState, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(203, 203, 203))
                     .addGroup(TaskEditFrameLayout.createSequentialGroup()
                         .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -148,7 +152,7 @@ public class Menu extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(TaskDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(TaskState, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
                 .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(TaskSaveButton)
@@ -317,19 +321,23 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_NewTaskActionPerformed
 
     private void EditTask(int index){
-       Task task=taskManager.getTaskByIndex(index);
-       taskManager.setEditedTask(index);
-       TaskHeaderLabel.setText("Edit Task");
-       TaskDescription.setText(task.getDescription());
-       TaskName.setText(task.getName());
-       TaskDate.setText(task.GetDeadLineToString());
-       TaskEditFrame.setVisible(true);
-       TaskEditFrame.pack();
-       TaskEditFrame.toFront();
-            
+        String name=TaskList.getSelectedValue();
+        Task task=taskManager.getTaskByName(name);
+        if(task!=null ){
+            taskManager.setEditedTask(index);
+            TaskHeaderLabel.setText("Edit Task");
+            TaskDescription.setText(task.getDescription());
+            TaskName.setText(task.getName());
+            TaskDate.setText(task.GetDeadLineToString());
+            TaskEditFrame.setVisible(true);
+            TaskEditFrame.pack();
+            TaskEditFrame.toFront();
+
+            TaskState.setSelectedIndex(IndexOfState.get(task.getState()));
+        };
     }
     private void TaskSaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TaskSaveButtonActionPerformed
-        taskManager.addOrEditTask(TaskName.getText(),TaskDescription.getText(),StringToDate(TaskDate.getText()));
+        taskManager.addOrEditTask(TaskName.getText(),TaskDescription.getText(),StringToDate(TaskDate.getText()),TaskState.getSelectedItem().toString());
         TaskEditFrame.setVisible(false);
         UpdateTaskList();
     }//GEN-LAST:event_TaskSaveButtonActionPerformed
@@ -351,9 +359,7 @@ public class Menu extends javax.swing.JFrame {
     }//GEN-LAST:event_TaskListMouseClicked
 
     private void sortByNameMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortByNameMenuActionPerformed
-        taskManager.getTasks().sort((Task t1, Task t2)->{
-            return t1.getDescription().compareTo(t2.getDescription());
-        });
+        sortState="ByName";
         UpdateTaskList();
     }//GEN-LAST:event_sortByNameMenuActionPerformed
 
@@ -365,8 +371,8 @@ public class Menu extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_TaskNameActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    private void TaskStateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TaskStateActionPerformed
+    }//GEN-LAST:event_TaskStateActionPerformed
 
     /**
      * @param args the command line arguments
@@ -404,15 +410,26 @@ public class Menu extends javax.swing.JFrame {
     }
     
     public ListModel<String> GetTaskList() {
-        return taskManager.getTasksForListFx();
-        
+        ArrayList<Task> lista =  taskManager.getTasks();
+        switch (sortState) {
+                case ("ByName"): lista.sort(Menu::SortByName);                    
+                    break;
+        }
+
+        return TaskManager.getTasksForListFx(lista);
     }
     public void UpdateTaskList() {
-        TaskList.setModel(GetTaskList());
+        UpdateTaskList(GetTaskList());
+    }
+    public void UpdateTaskList(ListModel<String> taskList) {
+        TaskList.setModel(taskList);
         TaskList.updateUI();
     }
     
-    
+    public static int SortByName(Task t1, Task t2) {
+        return t1.getName().compareTo(t2.getName());
+    };
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -425,12 +442,12 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JList<String> TaskList;
     private javax.swing.JTextField TaskName;
     private javax.swing.JButton TaskSaveButton;
+    private javax.swing.JComboBox<String> TaskState;
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem contentsMenuItem;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JMenu listMenu;

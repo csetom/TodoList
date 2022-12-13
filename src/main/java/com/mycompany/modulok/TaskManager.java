@@ -43,9 +43,9 @@ public class TaskManager {
         return Tasks;
     }
     
-    public ListModel<String> getTasksForListFx() {
+    public static ListModel<String> getTasksForListFx(ArrayList<Task> tasks) {
         DefaultListModel<String> listModel = new DefaultListModel<String>();
-        Tasks.forEach( (Task task)->{
+        tasks.forEach( (Task task)->{
             listModel.addElement(task.getName());
         });
         return listModel;
@@ -90,19 +90,24 @@ public class TaskManager {
         Tasks=gson.fromJson(myFileReader,listType);
     };
 
-    public void addOrEditTask(String Name, String description, Date datum) {
+    public void addOrEditTask(String Name, String description, Date datum, String state) {
         if (editedTask>=0){
             Task task=Tasks.get(editedTask);
             task.setDescription(description);
             task.setName(Name);
             task.setDeadLine(datum);
-
+            task.setState(state);
             editedTask=-1;
         } else {
-            Tasks.add(new Task(Name, description,new Date(2022,11,11),"LOL"));
+            Tasks.add(new Task(Name, description,new Date(2022,11,11),state));
         }
     }
     public Task getTaskByIndex(int index) {
         return Tasks.get(index);
+    }
+    public Task getTaskByName(String name) {
+        return Tasks.stream().filter((Task t)->{
+            return t.getName().equals(name);
+        }).findFirst().orElse(null);
     }
 }
