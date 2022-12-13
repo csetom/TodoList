@@ -410,7 +410,8 @@ public class Menu extends javax.swing.JFrame {
     }
     
     public ListModel<String> GetTaskList() {
-        ArrayList<Task> lista =  taskManager.getTasks();
+        ArrayList<Task> lista = new ArrayList<Task>();
+        lista=(ArrayList)taskManager.getTasks().clone();
         switch (sortState) {
                 case ("ByName"): lista.sort(Menu::SortByName);                    
                     break;
