@@ -8,6 +8,7 @@ import com.mycompany.modulok.Task;
 import com.mycompany.modulok.TaskManager;
 import java.io.FileNotFoundException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,6 +49,8 @@ public class Menu extends javax.swing.JFrame {
         TaskSaveButton = new javax.swing.JButton();
         TaskCancelButton = new javax.swing.JButton();
         TaskDate = new javax.swing.JTextField();
+        TaskName = new javax.swing.JTextField();
+        jTextField1 = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         TaskList = new javax.swing.JList<>();
         NewTask = new javax.swing.JButton();
@@ -94,27 +97,31 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
+        TaskName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TaskNameActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout TaskEditFrameLayout = new javax.swing.GroupLayout(TaskEditFrame.getContentPane());
         TaskEditFrame.getContentPane().setLayout(TaskEditFrameLayout);
         TaskEditFrameLayout.setHorizontalGroup(
             TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
             .addGroup(TaskEditFrameLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(TaskEditFrameLayout.createSequentialGroup()
-                            .addGap(0, 0, Short.MAX_VALUE)
-                            .addComponent(TaskSaveButton)
-                            .addGap(18, 18, 18)
-                            .addComponent(TaskCancelButton))
-                        .addGroup(TaskEditFrameLayout.createSequentialGroup()
-                            .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(TaskHeaderLabel, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(0, 0, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, TaskEditFrameLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(TaskDate, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(TaskSaveButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(TaskCancelButton))
+                    .addGroup(TaskEditFrameLayout.createSequentialGroup()
+                        .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(TaskHeaderLabel)
+                            .addComponent(TaskName, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(TaskDate, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         TaskEditFrameLayout.setVerticalGroup(
@@ -122,9 +129,11 @@ public class Menu extends javax.swing.JFrame {
             .addGroup(TaskEditFrameLayout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addComponent(TaskHeaderLabel)
-                .addGap(39, 39, 39)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
+                .addComponent(TaskName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(9, 9, 9)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(TaskDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -132,6 +141,8 @@ public class Menu extends javax.swing.JFrame {
                     .addComponent(TaskCancelButton))
                 .addGap(40, 40, 40))
         );
+
+        jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -261,24 +272,50 @@ public class Menu extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_openMenuItemActionPerformed
 
-    
-    private String Today() {
-        Date date = Calendar.getInstance().getTime();  
+    private String DateToString(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
         return  dateFormat.format(date);  
+    
+    }
+    private String TodayToString() {
+        Date date = Calendar.getInstance().getTime();  
+        return DateToString(date);
+    }
+    
+    private Date StringToDate(String sdate) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
+        try {
+            return dateFormat.parse(sdate);
+        } catch (ParseException ex) {
+            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
     private void NewTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NewTaskActionPerformed
         TaskEditFrame.setVisible(true);
         TaskHeaderLabel.setText("New Task");
         TaskDescription.setText("");
+        TaskName.setText("");
         TaskEditFrame.pack();
         TaskEditFrame.toFront();
-        TaskDate.setText(Today());
+        TaskDate.setText(TodayToString());
     }//GEN-LAST:event_NewTaskActionPerformed
 
+    private void EditTask(int index){
+       Task task=taskManager.getTaskByIndex(index);
+       taskManager.setEditedTask(index);
+       TaskHeaderLabel.setText("Edit Task");
+       TaskDescription.setText(task.getDescription());
+       TaskName.setText(task.getName());
+       TaskDate.setText(task.GetDeadLineToString());
+       TaskEditFrame.setVisible(true);
+       TaskEditFrame.pack();
+       TaskEditFrame.toFront();
+            
+    }
     private void TaskSaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TaskSaveButtonActionPerformed
-        taskManager.addOrEditTask(TaskDescription.getText());
+        taskManager.addOrEditTask(TaskName.getText(),TaskDescription.getText(),StringToDate(TaskDate.getText()));
         TaskEditFrame.setVisible(false);
         UpdateTaskList();
     }//GEN-LAST:event_TaskSaveButtonActionPerformed
@@ -309,17 +346,11 @@ public class Menu extends javax.swing.JFrame {
     private void TaskDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TaskDateActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_TaskDateActionPerformed
-    private void EditTask(int index){
-             Task task=taskManager.getTaskByIndex(index);
-            taskManager.setEditedTask(index);
-            TaskHeaderLabel.setText("Edit Task");
-            TaskDescription.setText(task.getDescription());
-            TaskDate.setText(task.GetDeadLineToString());
-            TaskEditFrame.setVisible(true);
-            TaskEditFrame.pack();
-            TaskEditFrame.toFront();
-            
-    }
+
+    private void TaskNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TaskNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_TaskNameActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -375,6 +406,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JFrame TaskEditFrame;
     private javax.swing.JLabel TaskHeaderLabel;
     private javax.swing.JList<String> TaskList;
+    private javax.swing.JTextField TaskName;
     private javax.swing.JButton TaskSaveButton;
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem contentsMenuItem;
@@ -383,6 +415,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu helpMenu;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JMenu listMenu;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openMenuItem;

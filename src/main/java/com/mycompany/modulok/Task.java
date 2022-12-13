@@ -13,7 +13,16 @@ import java.util.Date;
  * @author tcses
  */
 public class Task {
+
+    public void setName(String Name) {
+        this.Name = Name;
+    }
+
+    public String getName() {
+        return Name;
+    }
     
+    private String Name; 
     private String Description;
     private Date DeadLine;
     private String State; // VÁRAKOZÓ,BEFEJEZETT vagy HALASZTOTT
@@ -50,7 +59,8 @@ public class Task {
         this.State = State;
     }
 
-    public Task(String Description, Date DeadLine, String State) {
+    public Task(String Name, String Description, Date DeadLine, String State) {
+        this.Name=Name;
         this.Description = Description;
         this.DeadLine = DeadLine;
         this.State = State;
