@@ -16,6 +16,7 @@ import javax.swing.ListModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,38 +28,47 @@ import java.util.logging.Logger;
  */
 public class TaskManager {
 
+    public Hashtable<MyTask, Integer> getNotifications() {
+        return notifications;
+    }
 
-    private  ArrayList<Task> Tasks=new ArrayList<Task>();
-    private  Task editedTask;
+    public void setNotifications(Hashtable<MyTask, Integer> notifications) {
+        this.notifications = notifications;
+    }
 
-    public Task getEditedTask() {
+
+    private ArrayList<MyTask> Tasks=new ArrayList<MyTask>();
+    private MyTask editedTask;
+    private Hashtable<MyTask,Integer>  notifications = new Hashtable<MyTask,Integer>(); 
+
+    public MyTask getEditedTask() {
         return editedTask;
     }
 
-    public void setEditedTask(Task editedTask) {
+    public void setEditedTask(MyTask editedTask) {
         this.editedTask = editedTask;
     }
 
-    public ArrayList<Task> getTasks() {
+    public ArrayList<MyTask> getTasks() {
         return Tasks;
     }
     
-    public static ListModel<String> getTasksForListFx(ArrayList<Task> tasks) {
+    public static ListModel<String> getTasksForListFx(ArrayList<MyTask> tasks) {
         DefaultListModel<String> listModel = new DefaultListModel<String>();
-        tasks.forEach( (Task task)->{
+        tasks.forEach( (MyTask task)->{
             listModel.addElement(task.getName()+" | Hatarido: "+ task.GetDeadLineToString()+" ("+task.getState()+")" );
         });
         return listModel;
     }
-        public static ArrayList<String> getTaskNames (ArrayList<Task> tasks) {
+        public static ArrayList<String> getTaskNames (ArrayList<MyTask> tasks) {
         ArrayList<String> listModel = new ArrayList<String>();
-        tasks.forEach( (Task task)->{
+        tasks.forEach( (MyTask task)->{
             listModel.add(task.getName());
         });
         return listModel;
     }
 
-    public void setTasks(ArrayList<Task> Tasks) {
+    public void setTasks(ArrayList<MyTask> Tasks) {
         this.Tasks = Tasks;
     }
  
@@ -93,19 +103,24 @@ public class TaskManager {
         
        Gson gson = new Gson();        
         FileReader myFileReader =new FileReader("Taskok.JSON");
-        Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
+        Type listType = new TypeToken<ArrayList<MyTask>>(){}.getType();
         Tasks=gson.fromJson(myFileReader,listType);
     };
 
-    public void addOrEditTask(String Name, String description, Date datum, String state) {
+    public void addOrEditTask(String Name, String description, Date datum, String state, int Notifytime) {
         if (editedTask!=null){
             editedTask.setDescription(description);
             editedTask.setName(Name);
             editedTask.setDeadLine(datum);
             editedTask.setState(state);
         } else {
-            Tasks.add(new Task(Name, description,datum,state));
+            editedTask=new MyTask(Name, description,datum,state);
+            Tasks.add(editedTask);
         }
+        if (Notifytime>0) {
+            notifications.put(editedTask, Notifytime);
+System.out.println(Notifytime+editedTask.toString());
+        } 
         editedTask=null;
     }
     public void deleteTask () {
@@ -117,11 +132,11 @@ public class TaskManager {
         editedTask=null;
     }
         
-    public Task getTaskByIndex(int index) {
+    public MyTask getTaskByIndex(int index) {
         return Tasks.get(index);
     }
-    public Task getTaskByName(String name) {
-        editedTask=Tasks.stream().filter((Task t)->{
+    public MyTask getTaskByName(String name) {
+        editedTask=Tasks.stream().filter((MyTask t)->{
             return t.getName().equals(name);
         }).findFirst().orElse(null);
         return editedTask;

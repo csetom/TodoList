@@ -4,7 +4,8 @@
  */
 package com.mycompany.beadando2;
 
-import com.mycompany.modulok.Task;
+import com.mycompany.modulok.Notification;
+import com.mycompany.modulok.MyTask;
 import com.mycompany.modulok.TaskManager;
 import java.io.FileNotFoundException;
 import java.text.DateFormat;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.concurrent.Task;
 import javax.swing.JList;
 import javax.swing.ListModel;
 
@@ -33,9 +35,38 @@ public class Menu extends javax.swing.JFrame {
         IndexOfState.put("Folyamatban", 0);
         IndexOfState.put("Kesz", 1);
         IndexOfState.put("Uj", 2);
+        notification.start();
+        new Thread() {
+            public void run() {
+                while(true){
+                    if(notification.getNotifyingTasks().isEmpty()){
+                        
+                    } else {
+                        ArrayList<MyTask> removable=new ArrayList<MyTask>();
+                        notification.getNotifyingTasks().forEach(t->{
+                            NotifyLabel.setText(NotifyLabel.getText()+"* "+t.getName()+"\n");
+                            removable.add(t);
+                        });
+                        notification.getNotifyingTasks().removeAll(removable);
+                        NotifyTaskFrame.setVisible(true);            
+                        NotifyTaskFrame.pack();
+                        NotifyTaskFrame.toFront();
+                        
+                    }
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }.start();
     }
+    
     private TaskManager taskManager = new TaskManager();
-        Hashtable<String, Integer> IndexOfState = new Hashtable<String,Integer>();    
+    private Notification notification = new Notification(taskManager);
+
+    private Hashtable<String, Integer> IndexOfState = new Hashtable<String,Integer>();    
     private String sortState="";
     private String filterState="";
     ArrayList<String> TaskNameInList= new ArrayList<String>();
@@ -59,7 +90,12 @@ public class Menu extends javax.swing.JFrame {
         TaskName = new javax.swing.JTextField();
         TaskState = new javax.swing.JComboBox<>();
         deleteButton = new javax.swing.JButton();
+        notifyTime = new javax.swing.JSpinner();
         SortState = new javax.swing.ButtonGroup();
+        NotifyTaskFrame = new javax.swing.JFrame();
+        NotiOk = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        NotifyLabel = new javax.swing.JTextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
         TaskList = new javax.swing.JList<>();
         NewTask = new javax.swing.JButton();
@@ -132,6 +168,8 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
+        notifyTime.setToolTipText("Notify time in minute");
+
         javax.swing.GroupLayout TaskEditFrameLayout = new javax.swing.GroupLayout(TaskEditFrame.getContentPane());
         TaskEditFrame.getContentPane().setLayout(TaskEditFrameLayout);
         TaskEditFrameLayout.setHorizontalGroup(
@@ -141,9 +179,6 @@ public class Menu extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(TaskEditFrameLayout.createSequentialGroup()
-                        .addComponent(TaskState, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(203, 203, 203))
-                    .addGroup(TaskEditFrameLayout.createSequentialGroup()
                         .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(TaskHeaderLabel)
                             .addComponent(TaskDate)
@@ -151,8 +186,13 @@ public class Menu extends javax.swing.JFrame {
                                 .addComponent(TaskName)
                                 .addGap(1, 1, 1)))
                         .addGap(131, 131, 131))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, TaskEditFrameLayout.createSequentialGroup()
+                        .addComponent(TaskState, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(203, 203, 203))
                     .addGroup(TaskEditFrameLayout.createSequentialGroup()
-                        .addComponent(TaskSaveButton)
+                        .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(notifyTime)
+                            .addComponent(TaskSaveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(TaskCancelButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -172,12 +212,60 @@ public class Menu extends javax.swing.JFrame {
                 .addComponent(TaskDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(TaskState, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addComponent(notifyTime)
+                .addGap(18, 18, 18)
                 .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(TaskSaveButton)
                     .addComponent(TaskCancelButton)
                     .addComponent(deleteButton))
                 .addGap(40, 40, 40))
+        );
+
+        NotifyTaskFrame.setTitle("Notification ");
+        NotifyTaskFrame.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        NotifyTaskFrame.setFont(new java.awt.Font("aakar", 0, 24)); // NOI18N
+        TaskEditFrame.pack();
+
+        NotiOk.setText("OK");
+        NotiOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                NotiOkActionPerformed(evt);
+            }
+        });
+
+        NotifyLabel.setEditable(false);
+        NotifyLabel.setColumns(20);
+        NotifyLabel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        NotifyLabel.setRows(5);
+        NotifyLabel.setText("Megoldando Taskok:\n");
+        NotifyLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        NotifyLabel.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        NotifyLabel.setEnabled(false);
+        NotifyLabel.setFocusable(false);
+        jScrollPane3.setViewportView(NotifyLabel);
+
+        javax.swing.GroupLayout NotifyTaskFrameLayout = new javax.swing.GroupLayout(NotifyTaskFrame.getContentPane());
+        NotifyTaskFrame.getContentPane().setLayout(NotifyTaskFrameLayout);
+        NotifyTaskFrameLayout.setHorizontalGroup(
+            NotifyTaskFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(NotifyTaskFrameLayout.createSequentialGroup()
+                .addGap(123, 123, 123)
+                .addComponent(NotiOk)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(NotifyTaskFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        NotifyTaskFrameLayout.setVerticalGroup(
+            NotifyTaskFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(NotifyTaskFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(NotiOk)
+                .addContainerGap())
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -366,7 +454,7 @@ public class Menu extends javax.swing.JFrame {
 
     private void EditTask(int index){
         String name=TaskNameInList.get(index);
-        Task task=taskManager.getTaskByName(name);
+        MyTask task=taskManager.getTaskByName(name);
         if(task!=null ){
             deleteButton.setEnabled(true);
             TaskHeaderLabel.setText("Edit Task");
@@ -381,7 +469,7 @@ public class Menu extends javax.swing.JFrame {
         };
     }
     private void TaskSaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TaskSaveButtonActionPerformed
-        taskManager.addOrEditTask(TaskName.getText(),TaskDescription.getText(),StringToDate(TaskDate.getText()),TaskState.getSelectedItem().toString());
+        taskManager.addOrEditTask(TaskName.getText(),TaskDescription.getText(),StringToDate(TaskDate.getText()),TaskState.getSelectedItem().toString(), Integer.parseInt(notifyTime.getValue().toString()));
         TaskEditFrame.setVisible(false);
         deleteButton.setEnabled(false);
         UpdateTaskList();
@@ -441,6 +529,12 @@ public class Menu extends javax.swing.JFrame {
         taskManager.Save();
     }//GEN-LAST:event_formWindowClosing
 
+    private void NotiOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NotiOkActionPerformed
+        // TODO add your handling code here:
+        NotifyTaskFrame.setVisible(false);
+        NotifyLabel.setText("Megoldando Taskok:\n");
+    }//GEN-LAST:event_NotiOkActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -471,13 +565,20 @@ public class Menu extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Menu().setVisible(true);
+                new Menu().setVisible(true);  
             }
         });
     }
+    Task showMyTask = new Task<Void>() {
+        @Override
+        protected Void call() throws Exception {
+            NotifyTaskFrame.setVisible(true);
+            return null;
+        };
+    };
     
     public ListModel<String> GetTaskList() {
-        ArrayList<Task> lista = new ArrayList<Task>();
+        ArrayList<MyTask> lista = new ArrayList<MyTask>();
         lista=(ArrayList)taskManager.getTasks().clone();
         switch (sortState) {
                 case ("ByName"): lista.sort(Menu::SortByName);                
@@ -503,16 +604,16 @@ public class Menu extends javax.swing.JFrame {
         TaskList.updateUI();
     }
     
-    public static int SortByName(Task t1, Task t2) {
+    public static int SortByName(MyTask t1, MyTask t2) {
         return t1.getName().compareTo(t2.getName());
     };
-    public static int SortByState(Task t1, Task t2) {
+    public static int SortByState(MyTask t1, MyTask t2) {
         return t1.getState().compareTo(t2.getState());
     };
-    public static int SortByDate(Task t1, Task t2) {
+    public static int SortByDate(MyTask t1, MyTask t2) {
         return t1.getDeadLine().compareTo(t2.getDeadLine());
     };
-    public static int SortByDeadline(Task t1, Task t2) {
+    public static int SortByDeadline(MyTask t1, MyTask t2) {
         return t1.getName().compareTo(t2.getName());
     };
     
@@ -523,6 +624,9 @@ public class Menu extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton NewTask;
+    private javax.swing.JButton NotiOk;
+    private javax.swing.JTextArea NotifyLabel;
+    private javax.swing.JFrame NotifyTaskFrame;
     private javax.swing.JRadioButtonMenuItem SortByName;
     private javax.swing.ButtonGroup SortState;
     private javax.swing.JMenu SortSubMENU;
@@ -543,8 +647,10 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu helpMenu;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JMenu listMenu;
     private javax.swing.JMenuBar menuBar;
+    private javax.swing.JSpinner notifyTime;
     private javax.swing.JMenuItem openMenuItem;
     private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JRadioButtonMenuItem sortByDateMenu;
