@@ -39,6 +39,7 @@ public class Menu extends javax.swing.JFrame {
     private String sortState="";
     private String filterState="";
     ArrayList<String> TaskNameInList= new ArrayList<String>();
+    protected boolean editedTask=false;
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,6 +58,7 @@ public class Menu extends javax.swing.JFrame {
         TaskDate = new javax.swing.JTextField();
         TaskName = new javax.swing.JTextField();
         TaskState = new javax.swing.JComboBox<>();
+        deleteButton = new javax.swing.JButton();
         SortState = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         TaskList = new javax.swing.JList<>();
@@ -65,7 +67,6 @@ public class Menu extends javax.swing.JFrame {
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
         saveMenuItem = new javax.swing.JMenuItem();
-        saveAsMenuItem = new javax.swing.JMenuItem();
         exitMenuItem = new javax.swing.JMenuItem();
         listMenu = new javax.swing.JMenu();
         SortSubMENU = new javax.swing.JMenu();
@@ -122,6 +123,15 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
+        deleteButton.setText("Delete");
+        deleteButton.setToolTipText("Delete the task");
+        deleteButton.setEnabled(false);
+        deleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout TaskEditFrameLayout = new javax.swing.GroupLayout(TaskEditFrame.getContentPane());
         TaskEditFrame.getContentPane().setLayout(TaskEditFrameLayout);
         TaskEditFrameLayout.setHorizontalGroup(
@@ -135,16 +145,19 @@ public class Menu extends javax.swing.JFrame {
                         .addGap(203, 203, 203))
                     .addGroup(TaskEditFrameLayout.createSequentialGroup()
                         .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(TaskEditFrameLayout.createSequentialGroup()
-                                .addComponent(TaskSaveButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(TaskCancelButton))
                             .addComponent(TaskHeaderLabel)
                             .addComponent(TaskDate)
                             .addGroup(TaskEditFrameLayout.createSequentialGroup()
                                 .addComponent(TaskName)
                                 .addGap(1, 1, 1)))
-                        .addGap(131, 131, 131))))
+                        .addGap(131, 131, 131))
+                    .addGroup(TaskEditFrameLayout.createSequentialGroup()
+                        .addComponent(TaskSaveButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TaskCancelButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deleteButton)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         TaskEditFrameLayout.setVerticalGroup(
             TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,13 +175,19 @@ public class Menu extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
                 .addGroup(TaskEditFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(TaskSaveButton)
-                    .addComponent(TaskCancelButton))
+                    .addComponent(TaskCancelButton)
+                    .addComponent(deleteButton))
                 .addGap(40, 40, 40))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Csesznak RT Task Manager 2000 with knucels");
         setFont(new java.awt.Font("DejaVu Sans Mono", 0, 18)); // NOI18N
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         TaskList.setModel(GetTaskList());
         TaskList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -192,7 +211,7 @@ public class Menu extends javax.swing.JFrame {
 
         openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         openMenuItem.setMnemonic('o');
-        openMenuItem.setText("Open");
+        openMenuItem.setText("Load");
         openMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openMenuItemActionPerformed(evt);
@@ -209,12 +228,6 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         fileMenu.add(saveMenuItem);
-
-        saveAsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.ALT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        saveAsMenuItem.setMnemonic('a');
-        saveAsMenuItem.setText("Save As ...");
-        saveAsMenuItem.setDisplayedMnemonicIndex(5);
-        fileMenu.add(saveAsMenuItem);
 
         exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.ALT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
         exitMenuItem.setMnemonic('x');
@@ -311,7 +324,6 @@ public class Menu extends javax.swing.JFrame {
 
     private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMenuItemActionPerformed
         taskManager.Save();
-
     }//GEN-LAST:event_saveMenuItemActionPerformed
 
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
@@ -356,6 +368,7 @@ public class Menu extends javax.swing.JFrame {
         String name=TaskNameInList.get(index);
         Task task=taskManager.getTaskByName(name);
         if(task!=null ){
+            deleteButton.setEnabled(true);
             TaskHeaderLabel.setText("Edit Task");
             TaskDescription.setText(task.getDescription());
             TaskName.setText(task.getName());
@@ -370,6 +383,7 @@ public class Menu extends javax.swing.JFrame {
     private void TaskSaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TaskSaveButtonActionPerformed
         taskManager.addOrEditTask(TaskName.getText(),TaskDescription.getText(),StringToDate(TaskDate.getText()),TaskState.getSelectedItem().toString());
         TaskEditFrame.setVisible(false);
+        deleteButton.setEnabled(false);
         UpdateTaskList();
     }//GEN-LAST:event_TaskSaveButtonActionPerformed
 
@@ -377,7 +391,7 @@ public class Menu extends javax.swing.JFrame {
         // TODO add your handling code here:
         TaskEditFrame.setVisible(false);
         taskManager.setEditedTask(null);
-
+        deleteButton.setEnabled(false);
     }//GEN-LAST:event_TaskCancelButtonActionPerformed
 
     private void TaskListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TaskListMouseClicked
@@ -415,6 +429,17 @@ public class Menu extends javax.swing.JFrame {
         sortState="ByDeadline";
         UpdateTaskList();
     }//GEN-LAST:event_sortByDateMenuActionPerformed
+
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        TaskEditFrame.setVisible(false);
+        taskManager.deleteTask();
+        UpdateTaskList();
+    }//GEN-LAST:event_deleteButtonActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        taskManager.Save();
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
@@ -512,6 +537,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> TaskState;
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem contentsMenuItem;
+    private javax.swing.JButton deleteButton;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
@@ -520,7 +546,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu listMenu;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openMenuItem;
-    private javax.swing.JMenuItem saveAsMenuItem;
     private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JRadioButtonMenuItem sortByDateMenu;
     private javax.swing.JRadioButtonMenuItem sortByStateMenu;

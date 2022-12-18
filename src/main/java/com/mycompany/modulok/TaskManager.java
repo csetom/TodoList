@@ -108,6 +108,15 @@ public class TaskManager {
         }
         editedTask=null;
     }
+    public void deleteTask () {
+        if (editedTask!=null){
+              Tasks.remove(editedTask);
+        } else {
+            //Nothing
+        }
+        editedTask=null;
+    }
+        
     public Task getTaskByIndex(int index) {
         return Tasks.get(index);
     }
