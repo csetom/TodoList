@@ -7,7 +7,9 @@ package com.mycompany.beadando2;
 import com.mycompany.modulok.Notification;
 import com.mycompany.modulok.MyTask;
 import com.mycompany.modulok.TaskManager;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -110,7 +112,6 @@ public class Menu extends javax.swing.JFrame {
         sortByStateMenu = new javax.swing.JRadioButtonMenuItem();
         sortByDateMenu = new javax.swing.JRadioButtonMenuItem();
         helpMenu = new javax.swing.JMenu();
-        contentsMenuItem = new javax.swing.JMenuItem();
         aboutMenuItem = new javax.swing.JMenuItem();
 
         TaskEditFrame.setTitle("Task Edit");
@@ -368,12 +369,13 @@ public class Menu extends javax.swing.JFrame {
         helpMenu.setMnemonic('h');
         helpMenu.setText("Help");
 
-        contentsMenuItem.setMnemonic('c');
-        contentsMenuItem.setText("Contents");
-        helpMenu.add(contentsMenuItem);
-
         aboutMenuItem.setMnemonic('a');
         aboutMenuItem.setText("About");
+        aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutMenuItemActionPerformed(evt);
+            }
+        });
         helpMenu.add(aboutMenuItem);
 
         menuBar.add(helpMenu);
@@ -446,6 +448,7 @@ public class Menu extends javax.swing.JFrame {
         TaskEditFrame.setVisible(true);
         TaskHeaderLabel.setText("New Task");
         TaskDescription.setText("");
+        TaskState.setSelectedIndex(IndexOfState.get("Uj"));
         TaskName.setText("");
         TaskEditFrame.pack();
         TaskEditFrame.toFront();
@@ -534,6 +537,16 @@ public class Menu extends javax.swing.JFrame {
         NotifyTaskFrame.setVisible(false);
         NotifyLabel.setText("Megoldando Taskok:\n");
     }//GEN-LAST:event_NotiOkActionPerformed
+
+    private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
+        // TODO add your handling code here:
+        File file= new File ("README.md");
+        try {
+            java.awt.Desktop.getDesktop().open(file);
+        } catch (IOException ex) {
+            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -640,7 +653,6 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JButton TaskSaveButton;
     private javax.swing.JComboBox<String> TaskState;
     private javax.swing.JMenuItem aboutMenuItem;
-    private javax.swing.JMenuItem contentsMenuItem;
     private javax.swing.JButton deleteButton;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
