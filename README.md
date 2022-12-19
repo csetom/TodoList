@@ -25,3 +25,6 @@ A lista elsodlegesen letrehozas ideje szerinti sorrendbe rendezve jeleniti meg a
 
 Megnyitja ezt a filet.
 
+## FIGYELEM!
+
+A fileok kozvetlen modositasa sulyos problemakat kepes eloidezni.

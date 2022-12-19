@@ -440,8 +440,8 @@ public class Menu extends javax.swing.JFrame {
             return dateFormat.parse(sdate);
         } catch (ParseException ex) {
             Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+            return Calendar.getInstance().getTime();
         }
-        return null;
     }
     
     private void NewTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NewTaskActionPerformed
