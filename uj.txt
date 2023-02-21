@@ -1,3 +1,5 @@
-1: uj sort
+2: uj sort
 masodik uj sor.
-meg meg egy.
+Uj sort
+meg egy.
+negyedik
